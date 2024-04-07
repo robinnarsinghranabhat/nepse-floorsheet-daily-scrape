@@ -56,8 +56,8 @@ def merge_csv_files(folder_path):
     date = filename.split('-', 1)[-1].split('.')[0]  # Extracting date from the last file processed
     
     # Write the merged DataFrame to a new CSV file
-    combined_filename = os.path.join(folder_path, f"{date}.csv")
-    merged_df.to_csv(combined_filename, index=False)
+    combined_filename = os.path.join(folder_path, f"{date}.gz")
+    merged_df.to_csv(combined_filename, index=False, compression='gzip')
     return combined_filename
 
 import zipfile
@@ -76,7 +76,7 @@ nepse = Nepse()
 
 # This is necessary 
 nepse.headers['Connection'] = 'close'
-nepse.setTLSVerification(False) # This is temporary, until nepse sorts its ssl certificate problem
+nepse.setTLSVerification(True) # This is temporary, until nepse sorts its ssl certificate problem
 company_list = nepse.getCompanyList()
 symbols = [i['symbol'] for i in company_list]
 
@@ -84,10 +84,10 @@ symbols = [i['symbol'] for i in company_list]
 
 save_dir = 'floorsheets'
 os.makedirs(save_dir, exist_ok=True)
-business_date = str(date.today())
+business_date = str(date.today() - timedelta(1))
 errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, cache=False)
 print(errs)
 
 merged_file_path = merge_csv_files(save_dir)
-if merged_file_path:
-    csv_to_zip(merged_file_path)
+# if merged_file_path:
+#     csv_to_zip(merged_file_path)
