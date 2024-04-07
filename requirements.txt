@@ -1,0 +1,3 @@
+git+https://github.com/basic-bgnr/NepseUnofficialApi
+pandas>=1.4.2
+
