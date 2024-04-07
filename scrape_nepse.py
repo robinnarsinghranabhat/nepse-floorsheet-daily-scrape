@@ -23,6 +23,7 @@ def save_floorsheet_day(symbols, date, save_dir, cache=True):
     
     erred = []
     for symbol in symbols:
+        print(f"Symbol : {symbol} - DATE : {date}")
         out = save_floorsheet(symbol, date, save_dir,cache)
         if out:
             erred.append(out) 
@@ -84,8 +85,8 @@ symbols = [i['symbol'] for i in company_list]
 save_dir = 'floorsheets'
 os.makedirs(save_dir, exist_ok=True)
 business_date = str(date.today() - timedelta(1) )
-errs = save_floorsheet_day( symbols[:3], business_date,  save_dir)
-
+errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, cache=False)
+print(errs)
 merged_file_path = merge_csv_files(save_dir)
 
 csv_to_zip(merged_file_path)
