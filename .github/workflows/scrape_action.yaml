@@ -5,7 +5,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '25 20 * * *' # 11:20am UTC => 05:00pm Nepal Time
+    - cron: '26 20 * * *' # 11:20am UTC => 05:00pm Nepal Time
 
 jobs:
 
@@ -34,4 +34,4 @@ jobs:
            git config --local user.name "robinnarsinghranabhat"        
            git add .
            git commit -am "Floorsheet data scrapped successfully"
-           git push origin main
+           git push origin master

@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import date
+from datetime import date, timedelta
 import os
 from nepse import Nepse
 
@@ -36,7 +36,7 @@ def merge_csv_files(folder_path):
     
     # Initialize an empty DataFrame to store the merged data
     merged_df = pd.DataFrame()
-    
+    filename = None
     # Iterate through each file in the folder
     for filename in os.listdir(folder_path):
         # Check if the file is a CSV file
@@ -48,14 +48,28 @@ def merge_csv_files(folder_path):
             merged_df = merged_df.append(df, ignore_index=True)
             # Remove the individual CSV file
             os.remove(file_path)
-    
+    if not filename:
+        print("Data not available")
+        return
     # Get the date from the first file name
     date = filename.split('-', 1)[-1].split('.')[0]  # Extracting date from the last file processed
     
     # Write the merged DataFrame to a new CSV file
     combined_filename = os.path.join(folder_path, f"{date}.csv")
     merged_df.to_csv(combined_filename, index=False)
+    return combined_filename
 
+import zipfile
+from pathlib import Path
+
+def csv_to_zip(csv_file_path):
+    print("Converting CSV TO ZIP")
+    csv_file_path = Path(csv_file_path)
+    zip_file_path = f'./floorsheets/{csv_file_path.stem}.zip'
+    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+        # Add the CSV file to the zip file
+        zipf.write(zip_file_path, os.path.basename(csv_file_path))
+    os.remove(csv_file_path)
 
 nepse = Nepse()
 
@@ -69,7 +83,9 @@ symbols = [i['symbol'] for i in company_list]
 
 save_dir = 'floorsheets'
 os.makedirs(save_dir, exist_ok=True)
-business_date = str(date.today())
-errs = save_floorsheet_day( symbols, business_date,  save_dir)
+business_date = str(date.today() - timedelta(1) )
+errs = save_floorsheet_day( symbols[:3], business_date,  save_dir)
 
-merge_csv_files(save_dir)
+merged_file_path = merge_csv_files(save_dir)
+
+csv_to_zip(merged_file_path)
