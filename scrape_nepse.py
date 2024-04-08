@@ -2,15 +2,21 @@ import pandas as pd
 from datetime import date, timedelta
 import os
 from nepse import Nepse
+import time
+import random
 
 def save_floorsheet(nepse, symbol, date, save_dir, cache):
     file_name = f'./{save_dir}/{symbol}-{date}.csv'
     
     if cache and os.path.exists(file_name):
+        print("Caching ! ")
         return
     try:
+        time.sleep(random.uniform(1,5)) # Deliberate Throttling
         data = nepse.getFloorSheetOf(symbol=symbol, business_date=date)
         if not data:
+            print(f"No Data returned for {symbol}-{date}")
+
             return "Empty"
         data = pd.DataFrame(data)
         print(file_name)
@@ -21,14 +27,26 @@ def save_floorsheet(nepse, symbol, date, save_dir, cache):
         return {"ERROR" : e, 'symbol': symbol, 'date': date}
 
 
-def save_floorsheet_day(nepse, symbols, date, save_dir, cache=True):
+def save_floorsheet_day(symbols, date, save_dir, cache=True):
+
+    if os.path.exists( f'./{save_dir}/{date}.gz' ):
+        return
     
+    nepse = Nepse()
+    nepse.headers['Connection'] = 'close'
+    nepse.setTLSVerification(False) # This is temporary, until nepse sorts its ssl certificate problem
+
+
+    print("Processing : ", date)
+
     erred = []
     for symbol in symbols:
         print(f"Symbol : {symbol} - DATE : {date}")
         out = save_floorsheet(nepse, symbol, date, save_dir,cache)
         if out:
             erred.append(out) 
+
+    # merge_csv_files(save_dir)
     return erred
 
 def merge_csv_files(folder_path):
@@ -62,19 +80,6 @@ def merge_csv_files(folder_path):
     combined_filename = os.path.join(folder_path, f"{date}.gz")
     merged_df.to_csv(combined_filename, index=False, compression='gzip')
     return combined_filename
-
-import zipfile
-from pathlib import Path
-
-def csv_to_zip(csv_file_path):
-    print("Converting CSV TO ZIP")
-    csv_file_path = Path(csv_file_path)
-    zip_file_path = f'./floorsheets/{csv_file_path.stem}.zip'
-    # if os.path.exists('')
-    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
-        # Add the CSV file to the zip file
-        zipf.write(zip_file_path, os.path.basename(csv_file_path))
-    os.remove(csv_file_path)
 
 
 if __name__ == '__main__':
