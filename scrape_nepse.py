@@ -54,7 +54,7 @@ def merge_csv_files(folder_path):
         return
     
     # Initialize an empty DataFrame to store the merged data
-    merged_df = pd.DataFrame()
+    dfs = []
     save_name = None
     # Iterate through each file in the folder
     for filename in os.listdir(folder_path):
@@ -65,7 +65,7 @@ def merge_csv_files(folder_path):
             file_path = os.path.join(folder_path, filename)
             df = pd.read_csv(file_path)
             # Append the data to the merged DataFrame
-            merged_df = merged_df.append(df, ignore_index=True)
+            dfs.append(df)
             # Remove the individual CSV file
             os.remove(file_path)
     if not save_name:
@@ -76,6 +76,8 @@ def merge_csv_files(folder_path):
     
     # Write the merged DataFrame to a new CSV file
     combined_filename = os.path.join(folder_path, f"{date}.gz")
+
+    merged_df = pd.concat(dfs)
     merged_df.to_csv(combined_filename, index=False, compression='gzip')
     return combined_filename
 
