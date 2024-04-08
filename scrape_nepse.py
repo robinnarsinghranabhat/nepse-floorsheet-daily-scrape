@@ -45,8 +45,6 @@ def save_floorsheet_day(symbols, date, save_dir, cache=True):
         out = save_floorsheet(nepse, symbol, date, save_dir,cache)
         if out:
             erred.append(out) 
-
-    # merge_csv_files(save_dir)
     return erred
 
 def merge_csv_files(folder_path):
@@ -91,10 +89,10 @@ if __name__ == '__main__':
     company_list = nepse.getCompanyList()
     symbols = [i['symbol'] for i in company_list]
 
-    save_dir = 'floorsheets'
+    save_dir = 'floorsheets_test'
     os.makedirs(save_dir, exist_ok=True)
     business_date = str(date.today() - timedelta(1))
-    errs = save_floorsheet_day( nepse, symbols[:3], business_date,  save_dir, cache=False)
+    errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, cache=False)
     print(errs)
 
     merged_file_path = merge_csv_files(save_dir)
