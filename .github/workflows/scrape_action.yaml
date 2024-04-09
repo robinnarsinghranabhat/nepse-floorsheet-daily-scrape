@@ -30,15 +30,20 @@ jobs:
           python scrape_nepse.py
 
       - name: Check if CSV file exists
+        id: check_csv
         run: |
           if [ -f "./floorsheets_test/$(date +'%Y-%m-%d').gz" ]; then
             echo "CSV file exists"
+            echo "::set-output name=csv_exists::true"
           else
             echo "CSV file does not exist"
+            echo "::set-output name=csv_exists::false"
             exit 0 # don't show error
+            
           fi
 
       - name: Commit and Push Files
+        if: steps.check_csv.outputs.csv_exists == 'true'
         run: |
            git config --local user.email "robinnarsingha123@gmail.com"
            git config --local user.name "robinnarsinghranabhat"        
