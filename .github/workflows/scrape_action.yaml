@@ -5,7 +5,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '20 20 * * *' # 11:20am UTC => 05:00pm Nepal Time
+    - cron: '30 14 * * *' # UTC : 2:15 om >  8 pm daily nepal time.
 
 jobs:
 
