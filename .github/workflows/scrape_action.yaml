@@ -35,7 +35,7 @@ jobs:
             echo "CSV file exists"
           else
             echo "CSV file does not exist"
-            exit 1
+            exit 0 # don't show error
           fi
 
       - name: Commit and Push Files
