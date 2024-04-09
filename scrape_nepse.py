@@ -12,7 +12,7 @@ def save_floorsheet(nepse, symbol, date, save_dir, cache):
         print("Caching ! ")
         return
     try:
-        time.sleep(random.uniform(1,5)) # Deliberate Throttling
+        time.sleep(random.uniform(4,6)) # Deliberate Throttling
         data = nepse.getFloorSheetOf(symbol=symbol, business_date=date)
         if not data:
             print(f"No Data returned for {symbol}-{date}")
