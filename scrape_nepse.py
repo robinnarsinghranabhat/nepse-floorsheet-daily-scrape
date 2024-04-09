@@ -111,8 +111,8 @@ if __name__ == '__main__':
     os.makedirs(save_dir, exist_ok=True)
     business_date = str(date.today())
     user_agents_gen = user_agents_generator()
-    # errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, user_agents_gen, cache=False)
-    errs = save_floorsheet_day( ['JFL', 'HBL'], business_date,  save_dir, user_agents_gen, cache=False)
+    errs = save_floorsheet_day( symbols, business_date,  save_dir, user_agents_gen, cache=False)
+    # errs = save_floorsheet_day( ['JFL', 'HBL'], business_date,  save_dir, user_agents_gen, cache=False)
     print(errs)
 
     merged_file_path = merge_csv_files(save_dir)
