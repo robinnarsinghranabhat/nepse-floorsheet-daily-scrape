@@ -5,14 +5,32 @@ from nepse import Nepse
 import time
 import random
 
-def save_floorsheet(nepse, symbol, date, save_dir, cache):
+
+def user_agents_generator(file_path='user_agents.txt', chunk_size=200):
+    with open(file_path, 'r') as file:
+        while True:
+            chunk = [next(file).strip() for _ in range(chunk_size)]
+            if not chunk:  # End of file
+                file.seek(0)  # Move cursor to the beginning of the file
+                continue  # Restart the loop to cycle through the file
+            yield from chunk
+
+
+
+def save_floorsheet(symbol, date, save_dir, user_gen, cache):
+
+    nepse = Nepse()
+    nepse.headers['Connection'] = 'close'
+    nepse.headers['User-Agent'] = next(user_gen)
+    nepse.setTLSVerification(False) # This is temporary, until nepse sorts its ssl certificate problem
+
     file_name = f'./{save_dir}/{symbol}-{date}.csv'
     
     if cache and os.path.exists(file_name):
         print("Caching ! ")
         return
     try:
-        time.sleep(random.uniform(4,6)) # Deliberate Throttling
+        time.sleep(random.uniform(5,7)) # Deliberate Throttling
         data = nepse.getFloorSheetOf(symbol=symbol, business_date=date)
         if not data:
             print(f"No Data returned for {symbol}-{date}")
@@ -27,22 +45,18 @@ def save_floorsheet(nepse, symbol, date, save_dir, cache):
         return {"ERROR" : e, 'symbol': symbol, 'date': date}
 
 
-def save_floorsheet_day(symbols, date, save_dir, cache=True):
+def save_floorsheet_day(symbols, date, save_dir, user_gen, cache=True):
 
     if os.path.exists( f'./{save_dir}/{date}.gz' ):
         return
     
-    nepse = Nepse()
-    nepse.headers['Connection'] = 'close'
-    nepse.setTLSVerification(False) # This is temporary, until nepse sorts its ssl certificate problem
-
 
     print("Processing : ", date)
 
     erred = []
     for symbol in symbols:
         print(f"Symbol : {symbol} - DATE : {date}")
-        out = save_floorsheet(nepse, symbol, date, save_dir,cache)
+        out = save_floorsheet(symbol, date, save_dir,user_gen, cache)
         if out:
             erred.append(out) 
     return erred
@@ -91,10 +105,12 @@ if __name__ == '__main__':
     company_list = nepse.getCompanyList()
     symbols = [i['symbol'] for i in company_list]
 
-    save_dir = 'floorsheets_test'
+    save_dir = 'daily_floorsheets'
     os.makedirs(save_dir, exist_ok=True)
-    business_date = str(date.today() - timedelta(1))
-    errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, cache=False)
+    business_date = str(date.today())
+    user_agents_gen = user_agents_generator()
+    # errs = save_floorsheet_day( symbols[:3], business_date,  save_dir, user_agents_gen, cache=False)
+    errs = save_floorsheet_day( ['JFL', 'HBL'], business_date,  save_dir, user_agents_gen, cache=False)
     print(errs)
 
     merged_file_path = merge_csv_files(save_dir)
