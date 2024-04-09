@@ -32,7 +32,7 @@ jobs:
       - name: Check if CSV file exists
         id: check_csv
         run: |
-          if [ -f "./floorsheets_test/$(date +'%Y-%m-%d').gz" ]; then
+          if [ -f "./daily_floorsheets/$(date +'%Y-%m-%d').gz" ]; then
             echo "CSV file exists"
             echo "::set-output name=csv_exists::true"
           else

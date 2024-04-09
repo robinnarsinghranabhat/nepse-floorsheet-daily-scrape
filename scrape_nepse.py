@@ -102,6 +102,8 @@ if __name__ == '__main__':
     # This is necessary 
     nepse.headers['Connection'] = 'close'
     nepse.setTLSVerification(False) # This is temporary, until nepse sorts its ssl certificate problem
+
+    # TODO : API to get companies that have been traded a given day ?  
     company_list = nepse.getCompanyList()
     symbols = [i['symbol'] for i in company_list]
 
