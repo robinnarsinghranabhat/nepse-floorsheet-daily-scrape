@@ -28,6 +28,16 @@ jobs:
       - name: Execute Scraping Script
         run: |
           python scrape_nepse.py
+
+      - name: Check if CSV file exists
+        run: |
+          if [ -f "./floorsheets_test/$(date +'%Y-%m-%d').gz" ]; then
+            echo "CSV file exists"
+          else
+            echo "CSV file does not exist"
+            exit 1
+          fi
+
       - name: Commit and Push Files
         run: |
            git config --local user.email "robinnarsingha123@gmail.com"
